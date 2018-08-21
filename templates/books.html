@@ -1,0 +1,67 @@
+<!-- Profile page-->
+
+{% extends "layout.html" %}
+
+{% block title %}
+	{% if error %}
+		Error | Books Limited
+	{% else %}
+		All Books | Books Limited
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+	{% if error %}
+		<h3>{{ error }}<h3>
+	{% else %}
+		<h3>Books Limited's Limited Library</h3>
+		{% if search is not none %}
+			<h5>Search results for <em>{{ search }}</em></h5>
+		{% else %}
+			<h5>Browse all books in no particular order (lol).</h5>
+		{% endif %}
+		<h6>Hopefully we have everything you're looking for...</h6>
+	{% endif %}
+
+	<!-- Page numbers top-->
+	<nav aria-label="Books found">
+	  <ul class="pagination">
+	    <li class="page-item disabled">
+	      <a class="page-link" href="#" tabindex="-1">Prev</a>
+	    </li>
+	    <li class="page-item"><a class="page-link" href="#">1</a></li>
+	    <li class="page-item active">
+	      <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+	    </li>
+	    <li class="page-item"><a class="page-link" href="#">3</a></li>
+	    <li class="page-item">
+	      <a class="page-link" href="#">Next</a>
+	    </li>
+	  </ul>
+	</nav>
+
+	<!-- Books -->
+	{% if books is not none %}
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Title</th>
+					<th>Author</th>
+					<th>Year</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for book in books %}
+					<tr>
+						<td><a href="{{ url_for('book', isbn=book.isbn) }}">{{ book.title }}</td>
+						<td>{{ book.author }}</td>
+						<td>{{ book.year }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% else %}
+		<h5>No books found. Really sorry...</h5>
+	{% endif %}
+
+{% endblock %}

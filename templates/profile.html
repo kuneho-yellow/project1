@@ -1,0 +1,21 @@
+<!-- Profile page-->
+
+{% extends "layout.html" %}
+
+{% block title %}
+	{% if error %}
+		Error | Books Limited
+	{% else %}
+		{{ displayname }}'s Profile | Books Limited
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+	{% if error %}
+		<h3>{{ error }}<h3>
+	{% elif username and username == profilename %}
+		<h3>My Books</h3>
+	{% else %}
+		<h3>{{ profiledisplayname }}'s Books</h3>
+	{% endif %}
+{% endblock %}

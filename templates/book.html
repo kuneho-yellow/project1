@@ -1,0 +1,55 @@
+<!-- Profile page-->
+
+{% extends "layout.html" %}
+
+{% block title %}
+	{% if error %}
+		Error | Books Limited
+	{% else %}
+		{{ book.title }} | Books Limited
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+	{% if error %}
+		<br>
+		<h3 class="text-center">{{ error }}<h3>
+	{% else %}
+		<!-- Book details -->
+		<h3>{{ book.title }}</h3>
+		<h6>Author: {{ book.author }}</h6>
+		<h6>Year Published: {{ book.year }}</h6>
+		<h6>ISBN: {{ book.isbn }}</h6>
+
+		<!-- Average user rating -->
+		<h6>Average user rating: {{ rating }} out of 5 stars<h6>
+		<h6>Rated by {{ ratingcount }} users<h6>
+		<br>
+	{% if loggedin %}
+		<!-- User's rating -->
+		<form class="form-inline" action={{ url_for('book', isbn=book.isbn) }}>
+		  <label class="my-1 mr-2" for="userrating">My Rating:</label>
+		  <select class="custom-select my-1 mr-sm-2" id="userrating">
+				<option selected>No Rating</option>
+				<option>5 stars</option>
+				<option>4 stars</option>
+				<option>3 stars</option>
+				<option>2 stars</option>
+				<option>1 star</option>
+		  </select>
+		  <button type="submit" class="btn btn-primary my-1">Save</button>
+		</form>
+
+		<!-- User's review -->
+		<form action={{ url_for('book', isbn=book.isbn) }}>
+			<div class="form-group">
+				<label for="userreview">My Review:</label>
+				<textarea class="form-control" id="userreview" rows="5" placeholder="Write a review">{{ userreview }}</textarea>
+			</div>
+		</form>
+		<button type="submit" class="btn btn-primary my-1">Submit</button>
+	{% endif %}
+		<h5>User reviews:</h5>
+
+	{% endif %}
+{% endblock %}

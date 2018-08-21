@@ -9,7 +9,36 @@
 		<!-- Page Title -->
 		<title>{% block title %}{% endblock %}</title>
 	</head>
+
 	<body>
+		<!-- Naviagation -->
+		<nav class="navbar navbar-expand navbar-light bg-light">
+			<a class="navbar-brand" href="/">Books Limited</a>
+			<ul class="navbar-nav mr-auto">
+				{% if username %}
+					<li class="navbar-item"><a class="nav-link" href="{{ url_for('profile', profilename=username) }}">Profile</a></li>
+				{% endif %}
+				<li class="navbar-item"><a class="nav-link" href="{{ url_for('books') }}">All Books</a></li>
+				<li class="navbar-item"
+					<span class="navbar-item">
+						<form action={{ url_for('search') }} class="form-inline my-2 my-lg-0">
+				      <input name="search" class="form-control mr-sm-2" type="search" placeholder="Search for books" aria-label="Search">
+				      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+				    </form>
+					</span>
+				</li>
+			</ul>
+			<ul class="navbar-nav">
+				{% if displayname %}
+					<li class="navbar-text">Hi, {{ displayname }}!</li>
+				{% endif %}
+				{% if username %}
+					<li class="navbar-item"><a class="nav-link" href="{{ url_for('logout') }}">Sign out</a></li>
+				{% endif %}
+			</ul>
+		</nav>
+
+		<!-- Page contents -->
 		<div class="container">
 			{% block body %}
 			{% endblock %}
