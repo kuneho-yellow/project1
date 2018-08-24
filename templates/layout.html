@@ -13,20 +13,15 @@
 	<body>
 		<!-- Naviagation -->
 		<nav class="navbar navbar-expand-lg navbar-light alert-info">
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
 			<ul class="navbar-nav mr-auto">
-				<li>
-					<div class="collapse navbar-collapse">
-						<a class="navbar-brand" href="/">Books Limited</a>
-					</div>
+				<li class="collapse navbar-collapse">
+					<a class="navbar-brand" href="/">Books Limited</a>
 				</li>
 				{% if username %}
 					<li class="nav-item"><a class="nav-link" href="{{ url_for('profile', profilename=username) }}">Profile</a></li>
 				{% endif %}
 				<li class="nav-item"><a class="nav-link" href="{{ url_for('books') }}">All Books</a></li>
-				<li class="nav-item"
+				<li class="nav-item">
 					<span class="nav-item">
 						<form action={{ url_for('search') }} class="form-inline ml-lg-3 my-lg-0">
 				      <input name="search" class="form-control mr-sm-2" type="search" placeholder="Search for books" aria-label="Search">
@@ -37,10 +32,8 @@
 			</ul>
 			<ul class="navbar-nav">
 				<div class="collapse navbar-collapse">
-					{% if displayname %}
-						<li class="navbar-text text-dark">Hi, {{ displayname }}!</li>
-					{% endif %}
 					{% if username %}
+						<li class="navbar-text text-dark">Hi, {{ displayname }}!</li>
 						<li class="nav-item">
 							<a href="{{ url_for('logout') }}" class="btn ml-3 btn-outline-info">Sign out</a>
 						</li>
