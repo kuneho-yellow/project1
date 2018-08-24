@@ -18,4 +18,33 @@
 	{% else %}
 		<h3>{{ profiledisplayname }}'s Books</h3>
 	{% endif %}
+	<!-- Books -->
+	{% if profilebooks is not none %}
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Title</th>
+					<th>Author</th>
+					<th>My rating</th>
+					<th>My review</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for book in profilebooks %}
+					<tr>
+						<td><a href="{{ url_for('book', isbn=book.isbn) }}">{{ book.title }}</td>
+						<td>{{ book.author }}</td>
+						{% if book.rating == 0 %}
+							<td>No rating</td>
+						{% else %}
+							<td>{{ book.rating }}</td>
+						{% endif %}
+						<td>{{ book.review }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% else %}
+		<h5>No books found. Really sorry...</h5>
+	{% endif %}
 {% endblock %}

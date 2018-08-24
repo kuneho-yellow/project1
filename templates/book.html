@@ -12,7 +12,6 @@
 
 {% block body %}
 	{% if error %}
-		<br>
 		<h3 class="text-center">{{ error }}<h3>
 	{% else %}
 		<!-- Book details -->
@@ -25,31 +24,54 @@
 		<h6>Average user rating: {{ rating }} out of 5 stars<h6>
 		<h6>Rated by {{ ratingcount }} users<h6>
 		<br>
-	{% if loggedin %}
-		<!-- User's rating -->
-		<form class="form-inline" action={{ url_for('book', isbn=book.isbn) }}>
-		  <label class="my-1 mr-2" for="userrating">My Rating:</label>
-		  <select class="custom-select my-1 mr-sm-2" id="userrating">
-				<option selected>No Rating</option>
-				<option>5 stars</option>
-				<option>4 stars</option>
-				<option>3 stars</option>
-				<option>2 stars</option>
-				<option>1 star</option>
-		  </select>
-		  <button type="submit" class="btn btn-primary my-1">Save</button>
-		</form>
-
-		<!-- User's review -->
-		<form action={{ url_for('book', isbn=book.isbn) }}>
-			<div class="form-group">
+		{% if loggedin %}
+			<!-- User's rating -->
+			<form action={{ url_for('book', isbn=book.isbn) }} method="post">
+			  <label class="my-1 mr-2" for="userrating">My Rating:</label>
+				<div class="col-sm-4 col-md-3 ml-0 mb-2">
+				  <select class="custom-select my-1 mr-sm-2" name="userrating" width="200px">
+						<option value=0 {% if not userbookinfo.rating %}selected{% endif %}>No Rating</option>
+						<option value=5 {% if userbookinfo.rating == 5 %}selected{% endif %}>5 stars</option>
+						<option value=4 {% if userbookinfo.rating == 4 %}selected{% endif %}>4 stars</option>
+						<option value=3 {% if userbookinfo.rating == 3 %}selected{% endif %}>3 stars</option>
+						<option value=2 {% if userbookinfo.rating == 2 %}selected{% endif %}>2 stars</option>
+						<option value=1 {% if userbookinfo.rating == 1 %}selected{% endif %}>1 star</option>
+				  </select>
+				</div>
+				<!-- User's review -->
 				<label for="userreview">My Review:</label>
-				<textarea class="form-control" id="userreview" rows="5" placeholder="Write a review">{{ userreview }}</textarea>
-			</div>
-		</form>
-		<button type="submit" class="btn btn-primary my-1">Submit</button>
-	{% endif %}
-		<h5>User reviews:</h5>
+				<div class="ml-3 mr-3">
+					<textarea class="form-control mb-2" name="userreview" rows="5" placeholder="Write a review">{{ userbookinfo.review }}</textarea>
+					<!-- Submit button -->
+					<button type="submit" class="btn btn-primary my-1 mb-4">Submit my Rating and Review</button>
+				</div>
+			</form>
+		{% endif %}
 
+		<!-- Reviews from site users -->
+		<h5>User reviews:</h5>
+		{% if reviews is none %}
+			<h6>No reviews for this book yet.</h6>
+		{% else %}
+			{% for review in reviews %}
+				<div class="card my-2">
+					<div class="card-body">
+						<blockquote class="blockquote mb-0">
+							{% if not review.rating %}
+								<p><em>No rating given</em></p>
+							{% else %}
+								<p><em>{{ review.rating }} out of 5 stars</em></p>
+							{% endif %}
+							<p>{{ review.review }}</p>
+							<footer class="blockquote-footer">
+								<a href={{ url_for('profile', profilename=review.username) }}>
+									{{ review.displayname }}
+								</a>
+							</footer>
+						</blockquote>
+					</div>
+				</div>
+			{% endfor %}
+		{% endif %}
 	{% endif %}
 {% endblock %}

@@ -13,7 +13,15 @@ from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+from flask_debugtoolbar import DebugToolbarExtension
+
 app = Flask(__name__)
+
+# the toolbar is only enabled in debug mode:
+app.debug = True
+# set a 'SECRET_KEY' to enable the Flask session cookies
+app.config['SECRET_KEY'] = 'justasecretkeythatseasytoguess'
+toolbar = DebugToolbarExtension(app)
 
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
@@ -66,23 +74,20 @@ def register():
     # User has entered valid username and password
     if usernameError == "" and passwordError == "":
         # Handle the optional display name
-        if displayname != None:
+        if not displayname:
+            displayname = username
             commandStr = f"INSERT INTO users (username, password, displayname) VALUES ('{username}', '{password}', '{displayname}')"
-        else:
-            commandStr = f"INSERT INTO users (username, password) VALUES ('{username}', '{password}')"
         # Add the new credentials to the database
         db.execute(commandStr)
-        db.commit()
         # Automatically log in after registration
         session['username'] = username
-        if displayname != "":
-            session['displayname'] = displayname
-        else:
-            session['displayname'] = username
+        session['displayname'] = displayname
         # Redirect to profile page after registration
-        return redirect(url_for('profile', session['username']))
+        db.commit()
+        return redirect(url_for('profile', profilename=session['username']))
     
     # The user didn't enter a valid username or password
+    db.commit()
     return render_template("index.html",
                            registerusernameerror=usernameError,
                            registerpassworderror=passwordError,
@@ -127,9 +132,11 @@ def login():
             session['displayname'] = userData.username
         
         # Redirect to profile page after log in
-        return redirect(f"/profile/{username}")
+        db.commit()
+        return redirect(url_for('profile', profilename=session['username']))
     
     # The user didn't enter a valid username or password
+    db.commit()
     return render_template("index.html",
                            loginusernameerror=usernameError,
                            loginpassworderror=passwordError,
@@ -150,18 +157,23 @@ def profile(profilename):
     profiledisplayname = ""
     if profileData == None:
         error = "User does not exist"
+        db.commit()
         return render_template("profile.html", error=error)
-    elif profileData.displayname != "":
-        profiledisplayname = profileData.displayname
-    else:
-        profiledisplayname = profilename
+
+    # Get the books in this profile
+    profilebooks = db.execute("SELECT books.isbn, books.title, books.author, reviews.isbn, reviews.rating, reviews.review FROM reviews, books WHERE reviews.username = :username AND reviews.isbn = books.isbn",
+                              {"username": profilename})
+    if profilebooks.rowcount == 0:
+        profilebooks = None
     
     # Show the username's profile
+    db.commit()
     return render_template("profile.html",
                            username=session.get("username"),
                            displayname=session.get("displayname"),
                            profilename=profilename,
-                           profiledisplayname=profiledisplayname)
+                           profiledisplayname=profileData.displayname,
+                           profilebooks=profilebooks)
 
 @app.route("/books/")
 @app.route("/books/allbooks/", defaults={"page": 1})
@@ -177,18 +189,48 @@ def books(page = 1):
                            username=session.get("username"),
                            displayname=session.get("displayname"))
 
-@app.route("/books/<string:isbn>", methods=["GET"])
+@app.route("/books/<string:isbn>", methods=["GET", "POST"])
 def book(isbn):
-    # Check if the book woth the given isbn actually exists
+    # Check if a user is logged in
+    loggedin = False
+    if session.get("username") != None:
+        loggedin = True
+        
+    # Check if the book with the given isbn actually exists
     error = ""
     book = db.execute("SELECT * FROM books WHERE isbn = :isbn",
                       {"isbn": isbn}).fetchone()
+    # Just display an error message if book does not exist
     if book == None:
         error = "That book is not in our library... Really sorry."
         return render_template("book.html",
                            error=error,
                            username=session.get("username"),
                            displayname=session.get("displayname"))
+    
+    # Get the rating and review by the logged in user
+    userbookinfo = None
+    if loggedin:
+        userbookinfo = db.execute("SELECT rating, review FROM reviews WHERE isbn = :isbn AND username = :username",
+                            {"isbn": book.isbn, "username": session["username"]}).fetchone()
+    
+    # Check if the logged in user wants to update his book review
+    if loggedin and request.method == 'POST':
+        userrating = request.form.get("userrating")
+        userreview = request.form.get("userreview")
+        if userbookinfo == None:
+            # New review/rating entry
+            db.execute("INSERT INTO reviews (isbn, username, rating, review) VALUES (:isbn, :username, :rating, :review)",
+                       {"isbn": isbn, "username": session["username"], "rating": userrating, "review": userreview})
+        else:
+            # Update the existing entry
+            db.execute("UPDATE reviews SET rating = :rating, review = :review WHERE isbn = :isbn AND username = :username",
+                       {"isbn": isbn, "username": session["username"], "rating": userrating, "review": userreview})
+        db.commit()
+        # Update userbookinfo
+        userbookinfo = db.execute("SELECT rating, review FROM reviews WHERE isbn = :isbn AND username = :username",
+                            {"isbn": book.isbn, "username": session["username"]}).fetchone()
+    
     
     # Get entries where user rated the specified book
     ratings = db.execute("SELECT rating FROM reviews WHERE isbn = :isbn AND rating > 0",
@@ -197,25 +239,25 @@ def book(isbn):
     ratingcount = ratings.rowcount
     # Get the average rating for the book
     rating = 0
-    if ratingcount > 1:
-        rating = sum(ratings) / ratingcount
-        
+    if ratingcount > 0:
+        for row in ratings:
+            rating += row['rating']
+        rating /= ratingcount
+
     # Get entries where user reviewed the specified book
-    reviews = db.execute("SELECT username, review FROM reviews WHERE isbn = :isbn AND review IS NOT NULL",
+    reviews = db.execute("SELECT reviews.username, users.displayname, reviews.rating, reviews.review FROM reviews, users WHERE isbn = :isbn AND review <> '' AND reviews.username = users.username",
                             {"isbn": book.isbn})
     if reviews.rowcount == 0:
         reviews = None
-        
-    loggedin = False
-    if session.get("username") != None:
-        loggedin = True
     
+    db.commit()
     return render_template("book.html",
                            book=book,
                            rating=rating,
                            ratingcount=ratingcount,
                            reviews=reviews,
                            loggedin=loggedin,
+                           userbookinfo = userbookinfo,
                            username=session.get("username"),
                            displayname=session.get("displayname"))
 
@@ -234,6 +276,7 @@ def search(search = None):
     if not search or books.rowcount == 0:
         books = None
     
+    db.commit()
     return render_template("books.html",
                            search=search,
                            books=books,
