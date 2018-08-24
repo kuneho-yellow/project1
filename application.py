@@ -6,7 +6,7 @@ August 16, 2018
 Handle routes for the book review web application
 '''
 
-import os, requests, math
+import os, requests, math, re
 
 from flask import Flask, session, render_template, request, redirect, url_for, jsonify
 from flask_session import Session
@@ -68,16 +68,24 @@ def register():
     usernameError = "Please enter a username"
     passwordError = "Please enter a password"
     
-    # TODO: Check if username and password use all valid characters and length
     if username != "":
+        # Check if username contains invalid characters
+        if not re.match("^[\w]{3,30}$", username):
+            usernameError = f"The username is invalid. Please choose 3 to 30 characters with only letters, numbers, and underscores"
+            username=""
         # Check if username already exists
-        if db.execute("SELECT * FROM users WHERE username = :username",
+        elif db.execute("SELECT * FROM users WHERE username = :username",
                       {"username": username}).rowcount > 0:
             usernameError = f"The username '{username}' is already taken"
         else:
             usernameError = ""
     if password != "":
-        passwordError = ""
+        # Check if username contains invalid characters
+        if not re.match("^[\w]{3,30}$", password):
+            passwordError = f"The password is invalid. Please choose 3 to 30 characters with only letters, numbers, and underscores"
+            password=""
+        else:
+            passwordError = ""
     
     # User has entered valid username and password
     if usernameError == "" and passwordError == "":

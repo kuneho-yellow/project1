@@ -16,7 +16,7 @@
 				<div class="card border-info my-3 py-5 bg-light">
 					<div class="card-body text-center">
 						<h5 class="card-text">You are signed in as <strong>{{ username }}</strong></h5>
-						<a href="{{ url_for('logout') }}" class="btn mt-4 btn-info">Sign out</a>
+						<a href="{{ url_for('logout') }}" class="btn mt-4 btn-info btn-lg">Sign out</a>
 					</div>
 				</div>
 			</div>
@@ -34,19 +34,19 @@
 								{% if registerusernameerror %}
 									<div class="alert alert-danger" role="alert">{{ registerusernameerror }}</div>
 								{% endif %}
-								<input class="form-control" name="username" placeholder="Username" value="{{ registerlastusername }}">
+								<input class="form-control {% if registerusernameerror %}is-invalid{% endif %}" name="username" placeholder="Username" value="{{ registerlastusername }}">
 							</div>
 							<div class="form-group">
 								{% if registerpassworderror %}
 									<div class="alert alert-danger" role="alert">{{ registerpassworderror }}</div>
 								{% endif %}
-								<input type="password" class="form-control" name="password" placeholder="Password">
+								<input type="password" class="form-control {% if registerpassworderror %}is-invalid{% endif %}" name="password" placeholder="Password">
 							</div>
 							<div class="form-group">
 								<input class="form-control" name="displayname" placeholder="Your name (optional)" value="{{ registerlastdisplayname }}">
 							</div>
 							<div class="form-group text-center">
-								<button class="btn btn-success">Register</button>
+								<button class="btn btn-success btn-block">Register</button>
 							</div>
 						</form>
 					</div>
@@ -64,16 +64,16 @@
 								{% if loginusernameerror %}
 									<div class="alert alert-danger" role="alert">{{ loginusernameerror }}</div>
 								{% endif %}
-								<input class="form-control" name="username" placeholder="Username" value="{{ loginlastusername }}">
+								<input class="form-control {% if loginusernameerror %}is-invalid{% endif %}" name="username" placeholder="Username" value="{{ loginlastusername }}">
 							</div>
 							<div class="form-group">
 								{% if loginpassworderror %}
 									<div class="alert alert-danger" role="alert">{{ loginpassworderror }}</div>
 								{% endif %}
-								<input type="password" class="form-control" name="password" placeholder="Password">
+								<input type="password" class="form-control {% if loginpassworderror %}is-invalid{% endif %}" name="password" placeholder="Password">
 							</div>
 							<div class="form-group text-center">
-								<button class="btn btn-primary">Sign in</button>
+								<button class="btn btn-primary btn-block">Sign in</button>
 							</div>
 						</form>
 					</div>
