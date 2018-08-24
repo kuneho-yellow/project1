@@ -12,7 +12,7 @@
 
 {% block body %}
 	{% if error %}
-		<h3 class="text-center">{{ error }}<h3>
+		<div class="alert alert-danger" role="alert">{{ error }}</div>
 	{% else %}
 		<!-- Book details -->
 		<h3>{{ book.title }}</h3>
@@ -20,9 +20,9 @@
 		<h6>Year Published: {{ book.year }}</h6>
 		<h6>ISBN: {{ book.isbn }}</h6>
 
-		<!-- Average user rating -->
-		<h6>Average user rating: {{ rating }} out of 5 stars<h6>
-		<h6>Rated by {{ ratingcount }} users<h6>
+		<!-- Average rating -->
+		<h6>Books Limited rating: {{ rating }} out of 5 stars <em>(Rated by {{ ratingcount }} users)</em></h6>
+		<h6>Goodreads rating: {{ grrating }} out of 5 stars <em>(Rated by {{ grratingcount }} users)</em></h6>
 		<br>
 		{% if loggedin %}
 			<!-- User's rating -->
@@ -54,15 +54,15 @@
 			<h6>No reviews for this book yet.</h6>
 		{% else %}
 			{% for review in reviews %}
-				<div class="card my-2">
+				<div class="card my-2 border-info">
 					<div class="card-body">
 						<blockquote class="blockquote mb-0">
 							{% if not review.rating %}
-								<p><em>No rating given</em></p>
+								<h6 class="card-subtitle mb-2 text-muted"><em>No rating given</em></h6>
 							{% else %}
-								<p><em>{{ review.rating }} out of 5 stars</em></p>
+								<h6 class="card-subtitle mb-2 text-muted"><em>{{ review.rating }} out of 5 stars</em></h6>
 							{% endif %}
-							<p>{{ review.review }}</p>
+							<p class="card-text">{{ review.review }}</p>
 							<footer class="blockquote-footer">
 								<a href={{ url_for('profile', profilename=review.username) }}>
 									{{ review.displayname }}

@@ -7,52 +7,79 @@
 {% endblock %}
 
 {% block body %}
-	<h1>Welcome to Books Limited</h1>
-	<h4>The most limited book review resource in the internet.</h4>
+	<h1 class="text-center">Welcome to Books Limited</h1>
+	<h4 class="text-center">The most limited book review resource in the internet.</h4>
 
 	{% if loggedin %}
-		<h3>Logged in as {{ username }}</h3>
+		<div class="row justify-content-center">
+			<div class="col-md-6">
+				<div class="card border-info my-3 py-5 bg-light">
+					<div class="card-body text-center">
+						<h5 class="card-text">You are signed in as <strong>{{ username }}</strong></h5>
+						<a href="{{ url_for('logout') }}" class="btn mt-4 btn-info">Sign out</a>
+					</div>
+				</div>
+			</div>
+		</div>
 
 	{% else %}
-		<h3>Register here!</h3>
-		<form action="{{ url_for('register') }}" method="post">
-			<div class="form-group">
-				{% if registerusernameerror %}
-					<div class="alert alert-danger" role="alert">{{ registerusernameerror }}</div>
-				{% endif %}
-				<input class="form-control" name="username" placeholder="Username" value="{{ registerlastusername }}">
+	<div class="row">
+			<!-- Registration -->
+			<div class="col-md-6">
+				<div class="card my-3 border-success">
+					<div class="card-body">
+						<h3 class="card-title text-center">Register here!</h3>
+						<form class="px-4 py-3" action="{{ url_for('register') }}" method="post">
+							<div class="form-group">
+								{% if registerusernameerror %}
+									<div class="alert alert-danger" role="alert">{{ registerusernameerror }}</div>
+								{% endif %}
+								<input class="form-control" name="username" placeholder="Username" value="{{ registerlastusername }}">
+							</div>
+							<div class="form-group">
+								{% if registerpassworderror %}
+									<div class="alert alert-danger" role="alert">{{ registerpassworderror }}</div>
+								{% endif %}
+								<input type="password" class="form-control" name="password" placeholder="Password">
+							</div>
+							<div class="form-group">
+								<input class="form-control" name="displayname" placeholder="Your name (optional)" value="{{ registerlastdisplayname }}">
+							</div>
+							<div class="form-group text-center">
+								<button class="btn btn-success">Register</button>
+							</div>
+						</form>
+					</div>
+				</div>
 			</div>
-			<div class="form-group">
-				{% if registerpassworderror %}
-					<div class="alert alert-danger" role="alert">{{ registerpassworderror }}</div>
-				{% endif %}
-				<input type="password" class="form-control" name="password" placeholder="Password">
+
+			<!-- Member sign-in -->
+			<div class="col-md-6">
+				<div class="card my-3 border-primary">
+					<div class="card-body">
+						<h3 class="card-title text-center">Already a member?</h3>
+						<h3 class="card-title text-center">Sign in:</h3>
+						<form class="px-4 py-3" action="{{ url_for('login') }}" method="post">
+							<div class="form-group">
+								{% if loginusernameerror %}
+									<div class="alert alert-danger" role="alert">{{ loginusernameerror }}</div>
+								{% endif %}
+								<input class="form-control" name="username" placeholder="Username" value="{{ loginlastusername }}">
+							</div>
+							<div class="form-group">
+								{% if loginpassworderror %}
+									<div class="alert alert-danger" role="alert">{{ loginpassworderror }}</div>
+								{% endif %}
+								<input type="password" class="form-control" name="password" placeholder="Password">
+							</div>
+							<div class="form-group text-center">
+								<button class="btn btn-primary">Sign in</button>
+							</div>
+						</form>
+					</div>
+				</div>
 			</div>
-			<div class="form-group">
-				<input class="form-control" name="displayname" placeholder="Your name (optional)" value="{{ registerlastdisplayname }}">
-			</div>
-			<div class="form-group">
-				<button class="btn btn-primary">Register</button>
-			</div>
-		</form>
-		<h3>Already a member? Sign in:</h3>
-		<form action="{{ url_for('login') }}" method="post">
-			<div class="form-group">
-				{% if loginusernameerror %}
-					<div class="alert alert-danger" role="alert">{{ loginusernameerror }}</div>
-				{% endif %}
-				<input class="form-control" name="username" placeholder="Username" value="{{ loginlastusername }}">
-			</div>
-			<div class="form-group">
-				{% if loginpassworderror %}
-					<div class="alert alert-danger" role="alert">{{ loginpassworderror }}</div>
-				{% endif %}
-				<input type="password" class="form-control" name="password" placeholder="Password">
-			</div>
-			<div class="form-group">
-				<button class="btn btn-primary">Sign in</button>
-			</div>
-		</form>
+		</div>
 	{% endif %}
 
 {% endblock %}

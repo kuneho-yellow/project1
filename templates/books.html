@@ -5,43 +5,77 @@
 {% block title %}
 	{% if error %}
 		Error | Books Limited
+	{% elif search %}
+		Search Results for {{ search }} | Books Limited
 	{% else %}
 		All Books | Books Limited
 	{% endif %}
 {% endblock %}
 
 {% block body %}
-	{% if error %}
-		<h3>{{ error }}<h3>
+	<h3>Books Limited's Limited Library</h3>
+	<br>
+	{% if search %}
+		<h5>Search results for <em>{{ search }}</em></h5>
 	{% else %}
-		<h3>Books Limited's Limited Library</h3>
-		{% if search is not none %}
-			<h5>Search results for <em>{{ search }}</em></h5>
-		{% else %}
-			<h5>Browse all books in no particular order (lol).</h5>
-		{% endif %}
-		<h6>Hopefully we have everything you're looking for...</h6>
+		<h5>Browse all books in no particular order.</h5>
+	{% endif %}
+	<h6>Hopefully we have everything you're looking for...</h6>
+	<br>
+
+	{% if error %}
+		<div class="alert alert-danger" role="alert">{{ error }}</div>
 	{% endif %}
 
-	<!-- Page numbers top-->
-	<nav aria-label="Books found">
-	  <ul class="pagination">
-	    <li class="page-item disabled">
-	      <a class="page-link" href="#" tabindex="-1">Prev</a>
-	    </li>
-	    <li class="page-item"><a class="page-link" href="#">1</a></li>
-	    <li class="page-item active">
-	      <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
-	    </li>
-	    <li class="page-item"><a class="page-link" href="#">3</a></li>
-	    <li class="page-item">
-	      <a class="page-link" href="#">Next</a>
-	    </li>
-	  </ul>
-	</nav>
-
-	<!-- Books -->
 	{% if books is not none %}
+		<!-- Page numbers top-->
+		<nav aria-label="Books found">
+		  <ul class="pagination">
+		    <li class="page-item {% if page == 1 %}disabled{% endif %}">
+					{% if search %}
+		      	<a class="page-link" href={{ url_for('search', search=search, page=page-1) }} tabindex="-1">Prev</a>
+					{% else %}
+						<a class="page-link" href={{ url_for('books', page=page-1) }} tabindex="-1">Prev</a>
+					{% endif %}
+		    </li>
+				{% if pagenumbers %}
+					{% if maxpage < 10 %}
+						{% for n in range(1, maxpage + 1) %}
+							<li class="page-item {% if n == page %}active{% endif %}">
+								<a class="page-link" href={{ url_for('books', page=n) }}>{{ n }}</a>
+							</li>
+						{% endfor %}
+					{% elif page < 6 %}
+						{% for n in range(1, 11) %}
+							<li class="page-item {% if n == page %}active{% endif %}">
+								<a class="page-link" href={{ url_for('books', page=n) }}>{{ n }}</a>
+							</li>
+						{% endfor %}
+					{% elif page > maxpage - 5 %}
+						{% for n in range(maxpage - 9, maxpage + 1) %}
+							<li class="page-item {% if n == page %}active{% endif %}">
+								<a class="page-link" href={{ url_for('books', page=n) }}>{{ n }}</a>
+							</li>
+						{% endfor %}
+					{% else %}
+						{% for n in range(page - 5, page + 5) %}
+							<li class="page-item {% if n == page %}active{% endif %}">
+								<a class="page-link" href={{ url_for('books', page=n) }}>{{ n }}</a>
+							</li>
+						{% endfor %}
+					{% endif %}
+				{% endif %}
+		    <li class="page-item {% if page == maxpage %}disabled{% endif %}">
+					{% if search %}
+		      	<a class="page-link" href={{ url_for('search', search=search, page=page+1) }}>Next</a>
+					{% else %}
+		      	<a class="page-link" href={{ url_for('books', page=page+1) }}>Next</a>
+					{% endif %}
+		    </li>
+		  </ul>
+		</nav>
+
+		<!-- Books -->
 		<table class="table">
 			<thead>
 				<tr>
@@ -60,8 +94,52 @@
 				{% endfor %}
 			</tbody>
 		</table>
-	{% else %}
-		<h5>No books found. Really sorry...</h5>
-	{% endif %}
 
+		<!-- Page numbers bottom-->
+		<nav aria-label="Books found">
+		  <ul class="pagination">
+		    <li class="page-item {% if page == 1 %}disabled{% endif %}">
+					{% if search %}
+		      	<a class="page-link" href={{ url_for('search', search=search, page=page-1) }} tabindex="-1">Prev</a>
+					{% else %}
+						<a class="page-link" href={{ url_for('books', page=page-1) }} tabindex="-1">Prev</a>
+					{% endif %}
+		    </li>
+				{% if pagenumbers %}
+					{% if maxpage < 10 %}
+						{% for n in range(1, maxpage + 1) %}
+							<li class="page-item {% if n == page %}active{% endif %}">
+								<a class="page-link" href={{ url_for('books', page=n) }}>{{ n }}</a>
+							</li>
+						{% endfor %}
+					{% elif page < 6 %}
+						{% for n in range(1, 11) %}
+							<li class="page-item {% if n == page %}active{% endif %}">
+								<a class="page-link" href={{ url_for('books', page=n) }}>{{ n }}</a>
+							</li>
+						{% endfor %}
+					{% elif page > maxpage - 5 %}
+						{% for n in range(maxpage - 9, maxpage + 1) %}
+							<li class="page-item {% if n == page %}active{% endif %}">
+								<a class="page-link" href={{ url_for('books', page=n) }}>{{ n }}</a>
+							</li>
+						{% endfor %}
+					{% else %}
+						{% for n in range(page - 5, page + 5) %}
+							<li class="page-item {% if n == page %}active{% endif %}">
+								<a class="page-link" href={{ url_for('books', page=n) }}>{{ n }}</a>
+							</li>
+						{% endfor %}
+					{% endif %}
+				{% endif %}
+		    <li class="page-item {% if page == maxpage %}disabled{% endif %}">
+					{% if search %}
+		      	<a class="page-link" href={{ url_for('search', search=search, page=page+1) }}>Next</a>
+					{% else %}
+		      	<a class="page-link" href={{ url_for('books', page=page+1) }}>Next</a>
+					{% endif %}
+		    </li>
+		  </ul>
+		</nav>
+	{% endif %}
 {% endblock %}

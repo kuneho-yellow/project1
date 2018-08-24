@@ -6,7 +6,7 @@
 	{% if error %}
 		Error | Books Limited
 	{% else %}
-		{{ displayname }}'s Profile | Books Limited
+		{{ profiledisplayname }}'s Profile | Books Limited
 	{% endif %}
 {% endblock %}
 
@@ -44,7 +44,12 @@
 				{% endfor %}
 			</tbody>
 		</table>
+	{% elif username and username == profilename %}
+		<br>
+		<h5>You have no books in your profile.</h5>
+		<h5>Search for books or browse <a href={{ url_for('books') }}>the library</a> to start.</h5>
 	{% else %}
-		<h5>No books found. Really sorry...</h5>
+		<br>
+		<h5>This user has not added any books yet.</h5>
 	{% endif %}
 {% endblock %}
