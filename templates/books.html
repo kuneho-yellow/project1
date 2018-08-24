@@ -30,7 +30,7 @@
 	{% if books is not none %}
 		<!-- Page numbers top-->
 		<nav aria-label="Books found">
-		  <ul class="pagination">
+		  <ul class="pagination justify-content-center">
 		    <li class="page-item {% if page == 1 %}disabled{% endif %}">
 					{% if search %}
 		      	<a class="page-link" href={{ url_for('search', search=search, page=page-1) }} tabindex="-1">Prev</a>
@@ -97,7 +97,7 @@
 
 		<!-- Page numbers bottom-->
 		<nav aria-label="Books found">
-		  <ul class="pagination">
+		  <ul class="pagination justify-content-center">
 		    <li class="page-item {% if page == 1 %}disabled{% endif %}">
 					{% if search %}
 		      	<a class="page-link" href={{ url_for('search', search=search, page=page-1) }} tabindex="-1">Prev</a>
